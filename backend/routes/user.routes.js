@@ -1,6 +1,7 @@
 const express = require('express');
 const { body } = require('express-validator');
 const userController = require('../controllers/user.controller');
+const authMiddleware = require('../middlewares/auth.middleware');
 
 const router = express.Router();
 
@@ -22,5 +23,21 @@ router.post(
     ],
     userController.registerUser
 );
+
+
+// ✅ Add login route
+router.post(
+    '/login', [
+        body('email').isEmail().withMessage('Please provide a valid email address'),
+        body('password').exists().withMessage('Password is required'),
+    ],
+    userController.loginUser
+);
+
+
+router.get('/profile',
+    authMiddleware.authUser, userController.getUserProfile);
+router.get('/logout',
+    authMiddleware.authUser, userController.logoutUser);
 
 module.exports = router;
